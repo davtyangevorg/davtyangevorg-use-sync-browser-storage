@@ -1,41 +1,39 @@
 import { useSyncExternalStore } from "react";
 
 // Utility function to get an item from localStorage
-const getItemFromLocalStorage = (key) => {
+function getItemFromLocalStorage(key) {
   const item = localStorage.getItem(key);
   return item !== "undefined" ? JSON.parse(item) : undefined;
-};
+}
 
 // Utility function to get an item from sessionStorage
-const getItemFromSessionStorage = (key) => {
+function getItemFromSessionStorage(key) {
   const item = sessionStorage.getItem(key);
   return item !== "undefined" ? JSON.parse(item) : undefined;
-};
+}
 
 // Utility function to set an item to localStorage
-const setItemToLocalStorage = (key, value) => {
+function setItemToLocalStorage(key, value) {
   localStorage.setItem(key, JSON.stringify(value));
-};
+}
 // Utility function to set an item to sessionStorage
-const setItemToSessionStorage = (key, value) => {
+function setItemToSessionStorage(key, value) {
   sessionStorage.setItem(key, JSON.stringify(value));
-};
+}
 
 // Utility function to check if an item exists in localStorage
-const isItemInLocalStorage = (key) =>
-  key in localStorage && localStorage.getItem(key) !== null;
+function isItemInLocalStorage(key) {
+  return key in localStorage && localStorage.getItem(key) !== null;
+}
 
 // Utility function to check if an item exists in sessionStorage
 
-const isItemInSessionStorage = (key) =>
-  key in sessionStorage && sessionStorage.getItem(key) !== null;
+function isItemInSessionStorage(key) {
+  return key in sessionStorage && sessionStorage.getItem(key) !== null;
+}
 
 // Function to create a state and sync it with localStorage
-const createStateInStorage = ({
-  storageKey,
-  initialState,
-  storageFunctions,
-}) => {
+function createStateInStorage({ storageKey, initialState, storageFunctions }) {
   const listeners = new Set();
   const storedState = storageFunctions.getItem(storageKey);
   let state = storageFunctions.isItemInStorage(storageKey)
@@ -46,31 +44,33 @@ const createStateInStorage = ({
     storageFunctions.setItem(storageKey, initialState);
   }
 
-  const updateState = (newState) => {
+  function updateState(newState) {
     state = newState;
     storageFunctions.setItem(storageKey, newState);
     listeners.forEach((listener) => listener());
-  };
+  }
 
-  const getSnapShot = () => state;
+  function getSnapShot() {
+    return state;
+  }
 
-  const subscribe = (listener) => {
+  function subscribe(listener) {
     listeners.add(listener);
     return () => listeners.delete(listener);
-  };
+  }
 
   return { getSnapShot, subscribe, updateState };
-};
+}
 
 // Global store to keep track of state instances
 const store = {};
 
 // Hook to sync state with localStorage
-const useSyncWithBrowserStorage = ({
+function useSyncWithBrowserStorage({
   storageKey,
   initialState,
   storageFunctions,
-}) => {
+}) {
   if (!store[storageKey]) {
     store[storageKey] = createStateInStorage({
       storageKey,
@@ -83,9 +83,9 @@ const useSyncWithBrowserStorage = ({
   const currentState = useSyncExternalStore(subscribe, getSnapShot);
 
   return [currentState, updateState];
-};
+}
 
-const useSyncWithLocalStorage = ({ storageKey, initialState }) => {
+function useSyncWithLocalStorage({ storageKey, initialState }) {
   return useSyncWithBrowserStorage({
     storageKey,
     initialState,
@@ -95,9 +95,9 @@ const useSyncWithLocalStorage = ({ storageKey, initialState }) => {
       isItemInStorage: isItemInLocalStorage,
     },
   });
-};
+}
 
-const useSyncWithSessionStorage = ({ storageKey, initialState }) => {
+function useSyncWithSessionStorage({ storageKey, initialState }) {
   return useSyncWithBrowserStorage({
     storageKey,
     initialState,
@@ -107,6 +107,9 @@ const useSyncWithSessionStorage = ({ storageKey, initialState }) => {
       isItemInStorage: isItemInSessionStorage,
     },
   });
-};
+}
 
-export { useSyncWithLocalStorage, useSyncWithSessionStorage };
+module.exports = {
+  useSyncWithLocalStorage,
+  useSyncWithSessionStorage,
+};
