@@ -1,0 +1,14 @@
+{
+  "name": "use-sync-browser-storage",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "gev_d",
+  "license": "ISC",
+  "peerDependencies": {
+    "react": "^18.2.0"
+  }
+}
